@@ -5,8 +5,8 @@ const dtkSdk = require('dtk-nodejs-api-sdk');
  *  @appSecret: 用户填写 appSecret
  */ 
 
-const APP_KEY = '6283b426623d1'
-const APP_SECRET = 'd69c72bc2519f7b04f2f080e6107a18e'
+const APP_KEY = '62******3d1'
+const APP_SECRET = 'd69c***********7a18e'
 const sdk = new dtkSdk({appKey: APP_KEY, appSecret: APP_SECRET, checkSign:2});
 let URL = `https://openapi.dataoke.com/api/tb-service/twd-to-twd`
 let taobaoProInfor = {
