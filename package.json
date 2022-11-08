@@ -17,6 +17,7 @@
     "koa-router": "^10.1.1",
     "koa-static": "^5.0.0",
     "koa-views": "^8.0.0",
+    "mysql2": "^2.3.3",
     "nodemon": "^2.0.16",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
