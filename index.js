@@ -18,9 +18,8 @@ app.use(router.routes())
 
 const validateWechatHost = require('./utils/validateWechatHost')
 const { createResData } = require('./utils/createRespondData')
-const { getTaoBaoPro } = require('./utils/getTaoBaoProduct')
-
-
+const { createUser } = require('./controller/userOperator/createUser')
+const { sendMsg } = require('./utils/sendMsg')
 
 app.use(async ctx => {
   let validateRes = await validateWechatHost(ctx)
@@ -34,6 +33,7 @@ app.use(async ctx => {
       xmlJson[item] = xmlTemp[item][0]
     }
     console.log("xmlJson", xmlJson)
+    let xmlMsg = ''
     if(xmlJson.MsgType==='event' && xmlJson.EventKey === 'chifanpiao'){
       xmlJson.type = "news"
       xmlJson.content = [
@@ -46,19 +46,11 @@ app.use(async ctx => {
       ]
       xmlJson.count = 1
     } else if(xmlJson.MsgType==='text'){
-      // 查询淘宝官方接口，返回商品返现和优惠券详情逻辑
-      let taobaoPro = await getTaoBaoPro(xmlJson.Content)
-      let formateProductInfo = ''
-      if(taobaoPro.couponInfo !== 0 || taobaoPro.returnMoney){
-        formateProductInfo = `优惠券：${taobaoPro.couponInfo}\n券后价格：${taobaoPro.price}\n额外返现：${taobaoPro.returnMoney}\n----------------\n${taobaoPro.longTpwd}`
-      }else{
-        formateProductInfo = '亲，该商家无活动哦！'
-      }
-      xmlJson.type = 'text'
-      
-      xmlJson.content = formateProductInfo
+      // 新增用户绑定openId
+      await createUser(xmlJson.FromUserName)
+      xmlMsg = await sendMsg(xmlJson)
     }
-    let resMsg = createResData(xmlJson)
+    let resMsg = createResData(xmlMsg)
     ctx.body = resMsg
   }
 })

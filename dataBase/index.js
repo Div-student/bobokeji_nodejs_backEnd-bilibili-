@@ -15,18 +15,17 @@ const poolPromise = pool.promise()
 // 查询/删除数据库
 const queryData = async(sql)=>{
   let res = await poolPromise.execute(sql)
-  console.log('res==>', res[0])
+  return res[0]
 }
-
-let sql = "delete from user where user_id = '2'" // 删除数据
-let sqlquery = "select * from user " // 删除数据
+exports.queryData = queryData
 
 // 新增数据
 const insertData = async (tableName, keys, values)=>{
   let sql = `insert into ${tableName} (${keys.join(',')}) values ${values.join(',')}`
   let res = await poolPromise.execute(sql)
-  console.log('res==>', res[0])
+  return res[0]
 }
+exports.insertData = insertData
 
 // 更新数据
 const updateData = async(tableName, keys, values, wheresql) => {
@@ -36,10 +35,12 @@ const updateData = async(tableName, keys, values, wheresql) => {
   });
   let sql = `update ${tableName} set ${tempArray.join(',')} where ${wheresql}`
   let res = await poolPromise.execute(sql, values)
-  console.log('res==>', res[0])
+  return res[0]
 }
-
-queryData(sqlquery)
+exports.updateData = updateData
+// let sql = "delete from user where user_id = '10'" // 删除数据
+// let sqlquery = "select * from user " // 删除数据
+// queryData(sql)
 // let keys = ['user_name', "user_age"]
 // let values = ["('bobokeji03', 20)", "('bobokeji04', 21)"]
 // insertData('user', keys, values)
