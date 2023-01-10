@@ -58,6 +58,9 @@ app.use(async ctx => {
 router.get('/home', async (ctx) =>{
   await ctx.render('home', {name:'波波科技网络工作室001'})
 })
+router.get('/', async (ctx) =>{
+  await ctx.render('index', {})
+})
 
 app.listen('8080')
 console.log('serve is on at 8080')
