@@ -19,13 +19,27 @@ const queryData = async(sql)=>{
 }
 exports.queryData = queryData
 
-// 新增数据
-const insertData = async (tableName, keys, values)=>{
-  let sql = `insert into ${tableName} (${keys.join(',')}) values ${values.join(',')}`
-  let res = await poolPromise.execute(sql)
-  return res[0]
+
+const insertTable = async (tableName, fieds, Values) => {
+  let fiedsString = ''
+  let valuestrings = []
+
+  Values.forEach(re => {
+    let tempArray = []
+    fieds.forEach(item => {
+      tempArray.push(`'${re[item]}'`)
+    })
+    valuestrings.push(`(${tempArray.join(',')})`)
+  });
+  let sql = `insert into ${tableName}(${fieds.join(',')}) values${valuestrings.join(',')}`
+  try{
+    const res = await poolPromise.execute(sql)
+    return 'insert success'
+  }catch(err){
+    throw new Error(err)
+  }
 }
-exports.insertData = insertData
+exports.insertData = insertTable
 
 // 更新数据
 const updateData = async(tableName, keys, values, wheresql) => {
@@ -38,10 +52,10 @@ const updateData = async(tableName, keys, values, wheresql) => {
   return res[0]
 }
 exports.updateData = updateData
-// let sql = "delete from user where user_id = '10'" // 删除数据
-// let sqlquery = "select * from user " // 删除数据
+// let sql = "delete from jd_goods_list where price = 2099" // 删除数据
+// let sqlquery = "select * from user " // 查询数据
 // queryData(sql)
-// let keys = ['user_name', "user_age"]
-// let values = ["('bobokeji03', 20)", "('bobokeji04', 21)"]
+// let keys = ['wechat_uid', "user_nickname"]
+// let values = ["('bobokeji012345', 20456)", "('bobokeji0467890', 200)"]
 // insertData('user', keys, values)
-// updateData('user', ['user_name', 'user_age'], ['bobokeji004', 16], 'user_id=5')
+// updateData('user', ['wechat_uid', 'user_nickname'], ['test', 16], 'user_id=1')

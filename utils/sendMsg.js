@@ -1,21 +1,21 @@
 
 const { getGoodsInforandUrl } = require('../controller/JDpromotion/getJDgoodsUrl')
 const { getTaoBaoPro } = require('../utils/getTaoBaoProduct')
+const { commconfig } = require('./commconfig')
 
 const sendMsg = async (xmlJson)=>{
   // 调用京东接口查询返现
   let JDrepx = /(\bjd\.com\b)/g
   let isJDtest = JDrepx.test(xmlJson.Content)
-  console.log('isJDtest==>', isJDtest)
   if(isJDtest){
     // 提取字符串中的网址
     const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
     const strValue = xmlJson.Content.match(reg)[0];
     let JdRes = await getGoodsInforandUrl(strValue, xmlJson.FromUserName)
     let JdformateProductInfo = ''
-    if(JdRes.returnMoney !== 0){
+    if(JdRes.returnMoney !== 0 && JdRes.goodUrl){
       let tempName = JdRes.goodName.slice(0, 11) + '...'
-      JdformateProductInfo = `商品名称：${tempName}\n优惠券：${JdRes.coupon}\n券后价格：${JdRes.afterPrice}\n额外返现：${JdRes.returnMoney}\n----------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>`
+      JdformateProductInfo = `商品名称：${tempName}\n优惠券：${JdRes.coupon}\n券后价格：${JdRes.afterPrice}\n额外返现：${JdRes.returnMoney}\n----------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>\n**********************\n<a href="${commconfig.JDListUrl}">点击查看我的订单</a>`
     }else{
       JdformateProductInfo = '亲，该商家无活动哦！'
     }

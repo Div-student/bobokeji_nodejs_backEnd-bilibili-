@@ -72,13 +72,13 @@ const getGoodsInforandUrl = async(url, wechatId) => {
 exports.getGoodsInforandUrl = getGoodsInforandUrl
 
 
-let url = `【京东】【京喜】树花晓秀口腔清洁牙膏
-🌻牙膏中含有进口的蜂胶成分🌟能够有效的去除牙齿上的牙菌斑🌙让你的口腔更加的健康🌹它的质地非常的温和✨即使是敏感肌也可以放心使用🍀
-———————
-拼购价: ¥159.60
-券后拼购价: ¥79.60
+// let url = `【京东】【京喜】树花晓秀口腔清洁牙膏
+// 🌻牙膏中含有进口的蜂胶成分🌟能够有效的去除牙齿上的牙菌斑🌙让你的口腔更加的健康🌹它的质地非常的温和✨即使是敏感肌也可以放心使用🍀
+// ———————
+// 拼购价: ¥159.60
+// 券后拼购价: ¥79.60
 
-领券抢购: https://u.jd.com/5CjYUvE 73.00%`
+// 领券抢购: https://u.jd.com/5CjYUvE 73.00%`
 
 // getGoodInfor(url)
 // getSelfUrl(url, 'oF-RA6fbdaY0mXnMW5lzgWVlpOXM')

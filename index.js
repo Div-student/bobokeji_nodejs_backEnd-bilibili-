@@ -22,6 +22,7 @@ const { createUser } = require('./controller/userOperator/createUser')
 const { sendMsg } = require('./utils/sendMsg')
 
 app.use(async ctx => {
+  console.log('ctx.query===>', ctx.query)
   let validateRes = await validateWechatHost(ctx)
   if(ctx.request.method == "GET" && validateRes.isWechatHost){
     ctx.body = validateRes.echostr
@@ -58,9 +59,12 @@ app.use(async ctx => {
 router.get('/home', async (ctx) =>{
   await ctx.render('home', {name:'波波科技网络工作室001'})
 })
-router.get('/', async (ctx) =>{
-  await ctx.render('index', {})
+router.get('/jdlist', async (ctx) =>{
+  await ctx.render('jdList', {})
 })
+// router.get('/', async (ctx) =>{
+//   await ctx.render('index', {})
+// })
 
 app.listen('8080')
 console.log('serve is on at 8080')
