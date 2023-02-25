@@ -74,9 +74,9 @@ const insertJDlist = async(startTime, endTime) => {
   
     // 3、过滤掉已经更新的数据
     let afterFileterData = jdGoodList.filter(item => {
-      return !filterOrderIds.includes(item.orderId)
+      let ordId = item.orderId.toString()
+      return !filterOrderIds.includes(ordId)
     })
-    
     console.log('afterFileterData==>', afterFileterData)
     if(afterFileterData.length > 0){
       // 4、将数据插入表中
@@ -89,7 +89,5 @@ const insertJDlist = async(startTime, endTime) => {
   }
   return insertRes
 }
-
 exports.insertJDlist = insertJDlist
 
-// insertJDlist('2022-11-22 13:02:00', '2022-11-22 13:04:00')

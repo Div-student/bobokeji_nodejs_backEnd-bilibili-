@@ -52,7 +52,7 @@ const updateData = async(tableName, keys, values, wheresql) => {
   return res[0]
 }
 exports.updateData = updateData
-// let sql = "delete from jd_goods_list where price = 2099" // 删除数据
+// let sql = "delete from jd_goods_list where price = 60" // 删除数据
 // let sqlquery = "select * from user " // 查询数据
 // queryData(sql)
 // let keys = ['wechat_uid', "user_nickname"]

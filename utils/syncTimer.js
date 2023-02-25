@@ -11,9 +11,10 @@ const timerFn = async() => {
   let currentTime = new Date().getTime()
   let startTime = ''
   let endTime = ''
+  let currentFormatTime = moment(currentTime).format('yyyy-MM-DD HH:mm:ss')
   if(queryRes.length === 0){ // 需要判断一下第一次表中无数据的情况
     startTime = moment(currentTime - 5*60*1000).format('yyyy-MM-DD HH:mm:ss') // 当前时间前5分钟
-    endTime = moment(currentTime).format('yyyy-MM-DD HH:mm:ss') // 当前时间
+    endTime = currentFormatTime // 当前时间
   }else{
     let lastSyncTime = queryRes[0].lastsync_time
     startTime = moment(lastSyncTime).format('yyyy-MM-DD HH:mm:ss') // 上次更新时间
@@ -29,14 +30,15 @@ const timerFn = async() => {
     let insertValues = [
       {
         lastsync_time: currentTime,
+        lastsync_timeFormat: currentFormatTime,
         sync_type: "JDsync"
       }
     ]
-    tableRes = await insertData('sync_flag', ['lastsync_time', 'sync_type'], insertValues)
+    tableRes = await insertData('sync_flag', ['lastsync_time', 'sync_type', 'lastsync_timeFormat'], insertValues)
   }else{
-    tableRes = await updateData('sync_flag', ['lastsync_time'], [currentTime], `sync_type='JDsync'`)
+    tableRes = await updateData('sync_flag', ['lastsync_time', 'lastsync_timeFormat'], [currentTime, currentFormatTime], `sync_type='JDsync'`)
+    console.log('timerRes==>', currentTime, currentFormatTime)
   }
-  console.log('timerRes==>', timerRes)
 }
 
 schedule.scheduleJob('*/30 * * * * *', timerFn)

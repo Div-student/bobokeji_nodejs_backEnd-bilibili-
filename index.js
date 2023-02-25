@@ -21,6 +21,7 @@ const { createResData } = require('./utils/createRespondData')
 const { createUser } = require('./controller/userOperator/createUser')
 const { sendMsg } = require('./utils/sendMsg')
 
+
 app.use(async ctx => {
   console.log('ctx.query===>', ctx.query)
   let validateRes = await validateWechatHost(ctx)
@@ -48,7 +49,7 @@ app.use(async ctx => {
       xmlJson.count = 1
     } else if(xmlJson.MsgType==='text'){
       // 新增用户绑定openId
-      await createUser(xmlJson.FromUserName)
+      await createUser(xmlJson.FromUserName, xmlJson.ToUserName)
       xmlMsg = await sendMsg(xmlJson)
     }
     let resMsg = createResData(xmlMsg)
@@ -56,6 +57,9 @@ app.use(async ctx => {
   }
 })
 
+/**
+ * 页面渲染
+ */
 router.get('/home', async (ctx) =>{
   await ctx.render('home', {name:'波波科技网络工作室001'})
 })
@@ -65,6 +69,14 @@ router.get('/jdlist', async (ctx) =>{
 // router.get('/', async (ctx) =>{
 //   await ctx.render('index', {})
 // })
+
+/**
+ * 接口api
+ */
+// 根据用户的wechat_uid获取JD订单列表 api: /jdOrderList/get
+const getJdOrderList = require('./controller/JDpromotion/getJdOrderList')
+router.use('/jdOrderList', getJdOrderList.routes())
+
 
 app.listen('8080')
 console.log('serve is on at 8080')

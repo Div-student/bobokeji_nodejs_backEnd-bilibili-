@@ -9,15 +9,20 @@
   <link rel="stylesheet" href="/style/jdlist.css">
 </head>
 <body>
+  <div id="mask" style="display: none"><div>数据加载中...</div></div>
   <div class="page">
     <div class="page__hd">
       <h1 class="page__title">我的京东订单列表</h1>
       <p class="page__desc">订单预览</p>
+      <div id="nodata" style="display: none" class="weui-loadmore weui-loadmore_line">
+        <span class="weui-loadmore__tips">暂无订单数据</span>
+      </div>
     </div>
     <div id="JdlistWrap" class="page__bd">
     </div>
-    <div class="viewMore" onclick="getJdlist()">查看更多订单...</div>
+    <div id='viewMore' class="viewMore" onclick="getJdlist()">查看更多订单...</div>
   </div>
+  <script src="/javascript/axios.js"></script>
   <script src="/javascript/jdList.js"> </script>
 </body>
 </html>

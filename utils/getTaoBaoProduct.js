@@ -19,7 +19,7 @@ const getTaoBaoPro = async (content) => {
   let productInfo = await sdk.request(URL,{method:"GET",form:{version:"v1.0.0", content }})
   let productData = productInfo.data
   if(productData){
-    taobaoProInfor.couponInfo = productData.originalPrice - productData.actualPrice;
+    taobaoProInfor.couponInfo = Math.ceil(productData.originalPrice - productData.actualPrice);
     taobaoProInfor.longTpwd = productData.longTpwd;
     taobaoProInfor.price = productData.actualPrice
     taobaoProInfor.returnMoney = ((productData.actualPrice * (productData.maxCommissionRate/100)) * 0.9).toFixed(2)
