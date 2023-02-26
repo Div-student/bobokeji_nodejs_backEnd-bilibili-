@@ -34,7 +34,7 @@ const insertTable = async (tableName, fieds, Values) => {
   let sql = `insert into ${tableName}(${fieds.join(',')}) values${valuestrings.join(',')}`
   try{
     const res = await poolPromise.execute(sql)
-    return 'insert success'
+    return res[0].insertId
   }catch(err){
     throw new Error(err)
   }
@@ -56,6 +56,6 @@ exports.updateData = updateData
 // let sqlquery = "select * from user " // 查询数据
 // queryData(sql)
 // let keys = ['wechat_uid', "user_nickname"]
-// let values = ["('bobokeji012345', 20456)", "('bobokeji0467890', 200)"]
-// insertData('user', keys, values)
+// let values = [{wechat_uid:"1234", user_nickname:"bobo1"}, {wechat_uid:"4567", user_nickname:"bobo2"}]
+// insertTable('user', keys, values)
 // updateData('user', ['wechat_uid', 'user_nickname'], ['test', 16], 'user_id=1')

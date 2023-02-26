@@ -4,6 +4,7 @@
 const { apiRequest } = require("../../utils/dataokeSdkRequest")
 const { commconfig } = require("../../utils/commconfig")
 const { insertData, updateData, queryData } = require("../../dataBase/index.js")
+const { getRedisValue, setRedisValue } = require("../../dataBase/redis")
 
 // 获取京东订单数据
 const getJdOrderList = async(startTime, endTime) => {
@@ -19,9 +20,10 @@ const getJdOrderList = async(startTime, endTime) => {
   let orderIds = []
   let orderIdMap = {}
   if(goodListRes.code === 0 && goodListRes.data.length>0){
-    jdGoodList = goodListRes.data.map((item) => {
+    jdGoodList = await Promise.all(goodListRes.data.map(async(item) => {
       orderIds.push(item.orderId)
       orderIdMap[item.orderId] = item
+      let personMap = await getPersonFromRedis(item.positionId)
       return {
         price: item.price,
         skuName: item.skuName,
@@ -37,9 +39,11 @@ const getJdOrderList = async(startTime, endTime) => {
         finishTime: item.finishTime,
         positionId: item.positionId,
         subUnionId: item.subUnionId,
-        estimateCosPrice: item.estimateCosPrice
+        estimateCosPrice: item.estimateCosPrice,
+        wechat_uid: personMap.wechat_uid,
+        account_name: personMap.account_name
       }
-    })
+    }))
   }
   return { jdGoodList, orderIds, orderIdMap }
 }
@@ -82,7 +86,8 @@ const insertJDlist = async(startTime, endTime) => {
       // 4、将数据插入表中
       let tableKeys = [
         "price",'skuName','skuNum','finalRate','commissionRate','estimateFee','actualFee',
-        'actualCosPrice','orderId','validCode','orderTime','finishTime','subUnionId', 'positionId','estimateCosPrice'
+        'actualCosPrice','orderId','validCode','orderTime','finishTime','subUnionId', 'positionId',
+        'estimateCosPrice','wechat_uid','account_name'
       ]
       insertRes = await insertData('jd_goods_list', tableKeys, afterFileterData)
     }
@@ -91,3 +96,28 @@ const insertJDlist = async(startTime, endTime) => {
 }
 exports.insertJDlist = insertJDlist
 
+const getPersonFromRedis = async(key)=>{
+  let userMap = {
+    wechat_uid: "",
+    account_name: ""
+  }
+  let keyString = key.toString()
+  let userInfo = await getRedisValue(keyString)
+  if(userInfo){ // 从redis里取用户的信息
+    userMap.wechat_uid = userInfo.split(',')[0]
+    userMap.account_name = userInfo.split(',')[1]
+  }else{ // 如果redis里没有，则从mysql里获取用户信息，并存入redis下次便可以直接从redis获取数据
+    let querySql = `select * from user where user_id='${key}'`
+    let result = await queryData(querySql)
+    if(result.length > 0){
+      let userRes = [result[0].wechat_uid,result[0].account_name]
+      userMap.wechat_uid = result[0].wechat_uid
+      userMap.account_name = result[0].account_name
+      setRedisValue(keyString, userRes.join(',')) // 这里用异步处理，提高效率
+    }
+  }
+  console.log('userMap===>', userMap)
+  return userMap
+}
+
+// insertJDlist("2023-02-26 19:04:00","2023-02-26 19:06:00")

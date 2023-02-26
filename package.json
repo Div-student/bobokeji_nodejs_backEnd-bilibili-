@@ -21,6 +21,7 @@
     "mysql2": "^2.3.3",
     "node-schedule": "^2.1.1",
     "nodemon": "^2.0.16",
+    "redis": "^4.6.5",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "xml2js": "^0.4.23"
