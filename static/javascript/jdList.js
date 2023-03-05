@@ -4,7 +4,7 @@ let searchParam = window.location.search
 let wechatUid = searchParam.split('=')[1]
 
 let pageNum = 0
-let pageSize = 1
+let pageSize = 5
 let loadingDom = document.getElementById('mask')
 let nodataDom = document.getElementById('nodata')
 let viewMoreDom = document.getElementById('viewMore')

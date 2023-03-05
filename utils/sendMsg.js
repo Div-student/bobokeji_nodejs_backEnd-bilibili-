@@ -35,5 +35,20 @@ const sendMsg = async (xmlJson)=>{
   }
   return xmlJson
 }
-
 exports.sendMsg = sendMsg
+
+const sendNewsMsg = async (xmlJson)=>{
+  xmlJson.type = "news"
+  xmlJson.content = [
+    {
+      title: '外卖每日🧧合集',
+      description: '美团、饿了么每日大额度🧧限时领取，红包和商家满减优惠叠加使用哦',
+      picurl: 'https://mmbiz.qpic.cn/mmbiz_jpg/q5Fp4Y0f14uBuuO0MYHMXMp7SBokPUeQrPSOYTciavOzS8OawiaS88BfeWpgw6Q0ibPaQj6UegNSMcMzu3ArBibtDQ/0?wx_fmt=jpeg',
+      url: 'https://mp.weixin.qq.com/s/eDJy5PzijNaYd7SogPaZQA'
+    }
+  ]
+  xmlJson.count = 1
+
+  return xmlJson
+}
+exports.sendNewsMsg = sendNewsMsg

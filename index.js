@@ -19,7 +19,7 @@ app.use(router.routes())
 const validateWechatHost = require('./utils/validateWechatHost')
 const { createResData } = require('./utils/createRespondData')
 const { createUser } = require('./controller/userOperator/createUser')
-const { sendMsg } = require('./utils/sendMsg')
+const { sendMsg, sendNewsMsg } = require('./utils/sendMsg')
 
 
 app.use(async ctx => {
@@ -37,16 +37,7 @@ app.use(async ctx => {
     console.log("xmlJson", xmlJson)
     let xmlMsg = ''
     if(xmlJson.MsgType==='event' && xmlJson.EventKey === 'chifanpiao'){
-      xmlJson.type = "news"
-      xmlJson.content = [
-        {
-          title: '波波科技测试',
-          description: '波波科技测试',
-          picurl: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.jj20.com%2Fup%2Fallimg%2F1115%2F101021113337%2F211010113337-6-1200.jpg&refer=http%3A%2F%2Fimg.jj20.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1654594035&t=6e5217870597b6df9d6d0d7af1ebd452',
-          url: 'https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html#5'
-        }
-      ]
-      xmlJson.count = 1
+      xmlMsg = await sendNewsMsg(xmlJson)
     } else if(xmlJson.MsgType==='text'){
       // 新增用户绑定openId
       await createUser(xmlJson.FromUserName, xmlJson.ToUserName)
