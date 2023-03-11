@@ -2,16 +2,20 @@
 const { getGoodsInforandUrl } = require('../controller/JDpromotion/getJDgoodsUrl')
 const { getTaoBaoPro } = require('../utils/getTaoBaoProduct')
 const { commconfig } = require('./commconfig')
+const { setRedisMap, getRedisMap } = require('../dataBase/redis')
+const { setMutiplePart } = require('./setMutiplePart')
 
 const sendMsg = async (xmlJson)=>{
   // 调用京东接口查询返现
   let JDrepx = /(\bjd\.com\b)/g
   let isJDtest = JDrepx.test(xmlJson.Content)
+  let isSetMutipRepx = /(\bbobokeji\b)/g
+  let isSetMutip = isSetMutipRepx.test(xmlJson.Content)
   if(isJDtest){
     // 提取字符串中的网址
     const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
     const strValue = xmlJson.Content.match(reg)[0];
-    let JdRes = await getGoodsInforandUrl(strValue, xmlJson.FromUserName)
+    let JdRes = await getGoodsInforandUrl(strValue, xmlJson.FromUserName, xmlJson.ToUserName)
     let JdformateProductInfo = ''
     if(JdRes.returnMoney !== 0 && JdRes.goodUrl){
       let tempName = JdRes.goodName.slice(0, 11) + '...'
@@ -21,6 +25,11 @@ const sendMsg = async (xmlJson)=>{
     }
     xmlJson.type = 'text'
     xmlJson.content = JdformateProductInfo
+  }else if(isSetMutip){ // 多租户设置
+    console.log('isSetMutip===>', isSetMutip)
+    let sedMsg = await setMutiplePart(xmlJson)
+    xmlJson.type = 'text'
+    xmlJson.content = sedMsg
   }else{
     // 查询淘宝官方接口，返回商品返现和优惠券详情逻辑
     let taobaoPro = await getTaoBaoPro(xmlJson.Content)

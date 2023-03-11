@@ -1,6 +1,7 @@
 const dtkSdk = require('dtk-nodejs-api-sdk');
 const { commconfig } = require('../../utils/commconfig');
 const { queryData } = require('../../dataBase')
+const { getMutiplePartAccount } = require('../../utils/setMutiplePart')
 /*
  *  @checkSign: 1 默认老版本验签  2 新版验签
  *  @appKey: 用户填写 appkey
@@ -18,7 +19,8 @@ const goodInformation = {
 
 // 1、调用`京东链接解析`接口获取商品的ID
 const getGoodID = async(url)=>{
-  let goodID = '' 
+  let goodID = ''
+  // const sdk = new dtkSdk({appKey:commconfig.appKey,appSecret:commconfig.appSecret,checkSign:2});
   let res = await sdk.request('https://openapi.dataoke.com/api/dels/jd/kit/parseUrl',{
     method:"GET",
     form:{url, version:"v1.0.0"}
@@ -46,14 +48,18 @@ const getGoodInfor = async(url) => {
 }
 
 // 3、调用`京东商品转链`接口将商品转换成自己的推广链接
-const getSelfUrl = async (materialId, wechatId)=>{
-  let sql = `select * from user where wechat_uid='${wechatId}'`
+const getSelfUrl = async (materialId, wechatId, accountName)=>{
+  let sql = `select * from user where wechat_uid='${wechatId}' and account_name='${accountName}'`
   let sqlres = await queryData(sql)
   let user_id = 0
   if(sqlres.length>0){
     user_id = sqlres[0].user_id
   }
+  // 查询对于的公众号的账号信息
+  let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
   console.log('user_id===>', user_id)
+  console.log('daTaoKeAppKey===>', daTaoKeAppKey)
+  console.log('materialId===>', materialId)
   let res = await sdk.request('https://openapi.dataoke.com/api/dels/jd/kit/promotion-union-convert',{
     method:"GET",
     form:{ unionId:commconfig.unionId, materialId, positionId:user_id, version:"v1.0.0"}
@@ -64,8 +70,8 @@ const getSelfUrl = async (materialId, wechatId)=>{
   // console.log('goodInformation===>', goodInformation)
 }
 
-const getGoodsInforandUrl = async(url, wechatId) => {
-  await Promise.all([getGoodInfor(url), getSelfUrl(url, wechatId)])
+const getGoodsInforandUrl = async(url, wechatId, accountName) => {
+  await Promise.all([getGoodInfor(url), getSelfUrl(url, wechatId, accountName)])
   return goodInformation
 }
 

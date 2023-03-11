@@ -11,14 +11,20 @@ const getRedisValue = async (key)=>{
 }
 exports.getRedisValue = getRedisValue
 
-const setRedisValues = async (keyValues) => {
+const setRedisMap = async (key,field, value) => {
   await client.connect();
-  keyValues.forEach(async item => {
-    await client.set(Object.keys(item)[0], Object.values(item)[0]);
-  })
+  await client.hSet(key,field,value);
   await client.disconnect();
 }
-exports.setRedisValues = setRedisValues
+exports.setRedisMap = setRedisMap
+
+const getRedisMap = async (key, fild) => {
+  await client.connect();
+  let value = await client.hGet(key, fild);
+  await client.disconnect();
+  return value
+}
+exports.getRedisMap = getRedisMap
 
 const setRedisValue = async (key, value) => {
   await client.connect();
