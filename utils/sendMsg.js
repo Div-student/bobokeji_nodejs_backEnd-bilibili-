@@ -32,7 +32,7 @@ const sendMsg = async (xmlJson)=>{
     xmlJson.content = sedMsg
   }else{
     // 查询淘宝官方接口，返回商品返现和优惠券详情逻辑
-    let taobaoPro = await getTaoBaoPro(xmlJson.Content)
+    let taobaoPro = await getTaoBaoPro(xmlJson.Content, xmlJson.ToUserName)
     let formateProductInfo = ''
     if(taobaoPro.couponInfo !== 0 || taobaoPro.returnMoney){
       formateProductInfo = `优惠券：${taobaoPro.couponInfo}\n券后价格：${taobaoPro.price}\n额外返现：${taobaoPro.returnMoney}\n----------------\n${taobaoPro.longTpwd}`

@@ -1,12 +1,7 @@
 const dtkSdk = require('dtk-nodejs-api-sdk');
-const { commconfig } = require('./commconfig')
-/*
- *  @checkSign: 1 默认老版本验签  2 新版验签
- *  @appKey: 用户填写 appkey
- *  @appSecret: 用户填写 appSecret
- */ 
+const { commconfig } = require('./commconfig');
+const { getMutiplePartAccount } = require('./setMutiplePart')
 
-const sdk = new dtkSdk({appKey: commconfig.appKey, appSecret: commconfig.appSecret, checkSign:2});
 let URL = `https://openapi.dataoke.com/api/tb-service/twd-to-twd`
 let taobaoProInfor = {
   couponInfo: 0, // 优惠券
@@ -15,8 +10,13 @@ let taobaoProInfor = {
   longTpwd: '' // 淘口令
 }
 
-const getTaoBaoPro = async (content) => {
-  let productInfo = await sdk.request(URL,{method:"GET",form:{version:"v1.0.0", content }})
+const getTaoBaoPro = async (content, accountName) => {
+  // 根据不通的公众号初始化不同账号请求信息
+  let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
+  let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
+  const sdkReq = new dtkSdk({appKey:daTaoKeAppKey, appSecret:daTaoKeAppSecret, checkSign:2});
+
+  let productInfo = await sdkReq.request(URL,{method:"GET",form:{version:"v1.0.0", content }})
   let productData = productInfo.data
   if(productData){
     taobaoProInfor.couponInfo = Math.ceil(productData.originalPrice - productData.actualPrice);
@@ -31,7 +31,6 @@ const getTaoBaoPro = async (content) => {
       longTpwd: '' // 淘口令
     }
   }
-  console.log('taobaoProInfor===>', taobaoProInfor)
   return taobaoProInfor
 }
 

@@ -23,11 +23,7 @@ const { sendMsg, sendNewsMsg } = require('./utils/sendMsg')
 
 
 app.use(async ctx => {
-  console.log('ctx.query===>', ctx.query)
-  let validateRes = await validateWechatHost(ctx)
-  if(ctx.request.method == "GET" && validateRes.isWechatHost){
-    ctx.body = validateRes.echostr
-  }else if(ctx.request.method == "POST" && validateRes.isWechatHost){
+  if(ctx.request.method == "POST" && validateRes.isWechatHost){
     let xmlString = await xml2js.parseStringPromise(ctx.request.body)
     let xmlTemp = xmlString.xml
     let xmlJson = {}
@@ -57,9 +53,15 @@ router.get('/home', async (ctx) =>{
 router.get('/jdlist', async (ctx) =>{
   await ctx.render('jdList', {})
 })
-// router.get('/', async (ctx) =>{
-//   await ctx.render('index', {})
-// })
+router.get('/', async (ctx, next) =>{
+  let validateRes = await validateWechatHost(ctx)
+  if(ctx.request.method == "GET" && validateRes.isWechatHost){
+    ctx.body = validateRes.echostr
+    next()
+  }else{
+    await ctx.render('index', {})
+  }
+})
 
 /**
  * 接口api
