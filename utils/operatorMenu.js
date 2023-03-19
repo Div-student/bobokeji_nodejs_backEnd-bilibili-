@@ -14,19 +14,11 @@ const creatMenue = async () => {
         "key":"chifanpiao"
       },
       {
-        "name":"购物票",
-        "sub_button":[
-          {	
-            "type":"view",
-            "name":"优惠优选",
-            "url":"http://www.soso.com/"
-          },
-          {	
-            "type":"view",
-            "name":"解析返现",
-            "url":"https://www.bilibili.com/"
-          }
-        ]
+        "type":"miniprogram",
+        "name":"小程序",
+        "url":"http://mp.weixin.qq.com",
+        "appid":"wx5740cfc1ee869efc",
+        "pagepath":"pages/fistPage/fistPage"
       }
     ]
   }

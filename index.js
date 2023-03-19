@@ -23,7 +23,7 @@ const { sendMsg, sendNewsMsg } = require('./utils/sendMsg')
 
 
 app.use(async ctx => {
-  if(ctx.request.method == "POST" && validateRes.isWechatHost){
+  if(ctx.request.method == "POST"){
     let xmlString = await xml2js.parseStringPromise(ctx.request.body)
     let xmlTemp = xmlString.xml
     let xmlJson = {}
@@ -49,6 +49,9 @@ app.use(async ctx => {
  */
 router.get('/home', async (ctx) =>{
   await ctx.render('home', {name:'波波科技网络工作室001'})
+})
+router.get('/bobokejiDoc', async (ctx) =>{
+  await ctx.render('index', {})
 })
 router.get('/jdlist', async (ctx) =>{
   await ctx.render('jdList', {})

@@ -4,12 +4,12 @@ const fs = require('fs')
 const file_path = __dirname + '/token_file/accessToken.json'
 
 // 测试号的 APPID && APPSECRET
-// const APPID = 'wxea*******b8'
-// const APPSECRET = '6386bad*******cead06'
+// const APPID = 'wxeaf6f9a5e5b669b8'
+// const APPSECRET = '6386bad5201d9797b0fa53a96ecead06'
 
 // 生产环境的 APPID && APPSECRET
-const APPID = 'wx2********8171'
-const APPSECRET = 'ac27b3**********10'
+const APPID = 'wxeaf5105d22aa147c'
+const APPSECRET = '075a8b21a5b9a4d17e49e66294fc9a28'
 
 let uri = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APPID}&secret=${APPSECRET}`
 

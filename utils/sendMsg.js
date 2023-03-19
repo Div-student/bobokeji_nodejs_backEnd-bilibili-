@@ -2,7 +2,7 @@
 const { getGoodsInforandUrl } = require('../controller/JDpromotion/getJDgoodsUrl')
 const { getTaoBaoPro } = require('../utils/getTaoBaoProduct')
 const { commconfig } = require('./commconfig')
-const { setRedisMap, getRedisMap } = require('../dataBase/redis')
+const { setRedisMap } = require('../dataBase/redis')
 const { setMutiplePart } = require('./setMutiplePart')
 
 const sendMsg = async (xmlJson)=>{
@@ -11,7 +11,23 @@ const sendMsg = async (xmlJson)=>{
   let isJDtest = JDrepx.test(xmlJson.Content)
   let isSetMutipRepx = /(\bbobokeji\b)/g
   let isSetMutip = isSetMutipRepx.test(xmlJson.Content)
-  if(isJDtest){
+  let autoJsLearn = /^(学习|资料)+[0-9]*$/
+  let autoMatch = xmlJson.Content.match(autoJsLearn)
+  if(autoMatch !== null){
+    xmlJson.type = 'text'
+    xmlJson.content = `
+    一、舔狗神器的资料和源码：\n
+    百度网盘链接:https://pan.baidu.com/s/1gQ_QRCCvhzlEhHF01LabJw 提取码:30qy \n
+    
+    百度网盘:https://pan.baidu.com/s/1g35kZu_O5cLKeksp5a92NA 提取码:641n \n
+    
+    二、自动收能量源码: \n
+    github源码： https://github.com/Div-student/antEnergy \n
+    
+    三、公众号实战开发课程资料：\n 
+    链接: https://pan.baidu.com/s/1CkB7DjPxvpDwVAyvABBshw?pwd=tpp3 提取码: tpp3 
+    `
+  }else if(isJDtest){
     // 提取字符串中的网址
     const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
     const strValue = xmlJson.Content.match(reg)[0];

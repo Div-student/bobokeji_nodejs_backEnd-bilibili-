@@ -11,7 +11,6 @@ const createUser = async (openId, accountName) =>{
   if(result.length === 0){
     let insertRes = await insertData('user',['wechat_uid','account_name'],[{ wechat_uid:openId, account_name:accountName }])
     await setRedisValue(`${insertRes}`, `${openId},${accountName}`) // 组合成以用户id为key值，用户的openid和公众号名称为value值的键值对
-    await setRedisMap() // 构造成一个用户openid为key,
   }
 }
 exports.createUser = createUser
