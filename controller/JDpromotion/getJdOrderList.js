@@ -24,6 +24,6 @@ router.post('/get', async (ctx, next) => {
     code: responseCode,
     jdList: jDlistRes
   }
-  next()
+  // next()
 })
 module.exports = router

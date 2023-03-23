@@ -10,7 +10,7 @@ const { getRedisValue, setRedisValue } = require("../../dataBase/redis")
 const getJdOrderList = async(startTime, endTime) => {
   let orderlistUrl = 'https://openapi.dataoke.com/api/dels/jd/order/get-official-order-list'
   let params = {
-    type: 1, // 订单时间查询类型 1：下单时间，2：完成时间（购买用户确认收货时间），3：更新时间
+    type: 3, // 订单时间查询类型 1：下单时间，2：完成时间（购买用户确认收货时间），3：更新时间
     key: commconfig.JDKEY, // 京东联盟授权key
     startTime: startTime, // 开始时间 格式yyyy-MM-dd HH:mm:ss，与endTime间隔不超过1小时
     endTime: endTime // 结束时间 格式yyyy-MM-dd HH:mm:ss，与startTime间隔不超过1小时
@@ -19,11 +19,12 @@ const getJdOrderList = async(startTime, endTime) => {
   let jdGoodList = []
   let orderIds = []
   let orderIdMap = {}
-  if(goodListRes.code === 0 && goodListRes.data.length>0){
-    jdGoodList = await Promise.all(goodListRes.data.map(async(item) => {
+  if(goodListRes[0].code === 0 && goodListRes[0].data.length>0){
+    jdGoodList = await Promise.all(goodListRes[0].data.map(async(item) => {
       orderIds.push(item.orderId)
       orderIdMap[item.orderId] = item
       let personMap = await getPersonFromRedis(item.positionId)
+      console.log('personMap====>', personMap)
       return {
         price: item.price,
         skuName: item.skuName,
@@ -120,6 +121,6 @@ const getPersonFromRedis = async(key)=>{
   return userMap
 }
 
-// insertJDlist("2023-02-26 19:04:00","2023-02-26 19:06:00")
+// insertJDlist("2023-03-23 22:09:00", "2023-03-23 22:13:00")
 
-getJdOrderList("2023-02-27 22:46:00", "2023-02-27 22:50:00")
+// getJdOrderList("2023-03-23 22:09:00", "2023-03-23 22:13:00")

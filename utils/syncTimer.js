@@ -41,4 +41,4 @@ const timerFn = async() => {
   }
 }
 
-schedule.scheduleJob('*/30 * * * * *', timerFn)
+schedule.scheduleJob('*/5 * * * *', timerFn)

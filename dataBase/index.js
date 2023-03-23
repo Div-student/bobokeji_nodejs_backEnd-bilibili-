@@ -7,7 +7,7 @@ const pool = mysql.createPool({
   port: '3306',
   user: 'root',
   password: "ShenXiaoBo@520",
-  database: 'bobokeji'
+  database: 'bobokeji01'
 });
 
 const poolPromise = pool.promise()
