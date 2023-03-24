@@ -8,7 +8,7 @@ const { getMutiplePartAccount } = require('../../utils/setMutiplePart')
  *  @appSecret: 用户填写 appSecret
  */ 
 
-const goodInformation = {
+let goodInformation = {
   goodName: '',
   coupon: '',
   afterPrice: 0,
@@ -64,6 +64,8 @@ const getSelfUrl = async (materialId, wechatId, accountName, sdkReq)=>{
 }
 
 const getGoodsInforandUrl = async(url, wechatId, accountName) => {
+  // 清空上次的缓存数据，防止JD查询无商品返现时返回了推荐的商品
+  goodInformation = { goodName: '', coupon: '', afterPrice: 0, returnMoney: 0, goodUrl: '' }
   // 根据不通的公众号初始化不同账号请求信息
   let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
   let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
@@ -74,17 +76,3 @@ const getGoodsInforandUrl = async(url, wechatId, accountName) => {
 }
 
 exports.getGoodsInforandUrl = getGoodsInforandUrl
-
-
-// let url = `【京东】【京喜】树花晓秀口腔清洁牙膏
-// 🌻牙膏中含有进口的蜂胶成分🌟能够有效的去除牙齿上的牙菌斑🌙让你的口腔更加的健康🌹它的质地非常的温和✨即使是敏感肌也可以放心使用🍀
-// ———————
-// 拼购价: ¥159.60
-// 券后拼购价: ¥79.60
-
-// 领券抢购: https://u.jd.com/5CjYUvE 73.00%`
-
-// getGoodInfor(url)
-// getSelfUrl(url, 'oF-RA6fbdaY0mXnMW5lzgWVlpOXM')
-
-// getGoodsInforandUrl(url, 'oF-RA6fbdaY0mXnMW5lzgWVlpOXM')
