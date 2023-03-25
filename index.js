@@ -53,9 +53,16 @@ router.get('/home', async (ctx) =>{
 router.get('/bobokejiDoc', async (ctx) =>{
   await ctx.render('index', {})
 })
+// 京东订单列表页面
 router.get('/jdlist', async (ctx) =>{
   await ctx.render('jdList', {})
 })
+
+// 拼多多订单列表页面
+router.get('/pddlist', async (ctx) =>{
+  await ctx.render('pddList', {})
+})
+
 router.get('/', async (ctx, next) =>{
   let validateRes = await validateWechatHost(ctx)
   if(ctx.request.method == "GET" && validateRes.isWechatHost){
@@ -72,6 +79,7 @@ router.get('/', async (ctx, next) =>{
 // 根据用户的wechat_uid获取JD订单列表 api: /jdOrderList/get
 const getJdOrderList = require('./controller/JDpromotion/getJdOrderList')
 router.use('/jdOrderList', getJdOrderList.routes())
+
 
 
 app.listen('8080')

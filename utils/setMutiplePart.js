@@ -29,7 +29,7 @@ const setMutiplePart = async(xmlJson) => {
   // 判断设置的账号类型是否符合要求(大淘客appkey、大淘客密钥、京东联盟账号)
   let acountKey = xmlJson.Content.split(' ')[1]
   let acountValue = xmlJson.Content.split(' ')[2]
-  let accountTypes = ["daTaoKeAppKey", "daTaoKeAppSecret", "JDunionId"]
+  let accountTypes = ["daTaoKeAppKey", "daTaoKeAppSecret", "JDunionId", "PDDpid"]
   if(!accountTypes.includes(acountKey)){
     sendMsg = '您设置的账号类型不对'
     return sendMsg

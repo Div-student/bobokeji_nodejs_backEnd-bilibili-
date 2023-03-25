@@ -1,5 +1,6 @@
 
 const { getGoodsInforandUrl } = require('../controller/JDpromotion/getJDgoodsUrl')
+const { getPDDgoodsDetail } = require('../controller/PDDpromotion/getPDDgoodsInfor')
 const { getTaoBaoPro } = require('../utils/getTaoBaoProduct')
 const { commconfig } = require('./commconfig')
 const { setRedisMap } = require('../dataBase/redis')
@@ -9,8 +10,13 @@ const sendMsg = async (xmlJson)=>{
   // 调用京东接口查询返现
   let JDrepx = /(\bjd\.com\b)/g
   let isJDtest = JDrepx.test(xmlJson.Content)
+  // 判断是否为拼多多链接
+  let pddEXP = /(\bgoodsid\b|\bpxq_secret_key\b)/
+  let isPDDlind = pddEXP.test(xmlJson.Content)
+  // 判断是否为多租参数设置
   let isSetMutipRepx = /(\bbobokeji\b)/g
   let isSetMutip = isSetMutipRepx.test(xmlJson.Content)
+  // 判断是否是获取课程资料
   let autoJsLearn = /^(学习|资料)+[0-9]*$/
   let autoMatch = xmlJson.Content.match(autoJsLearn)
   if(autoMatch !== null){
@@ -27,6 +33,20 @@ const sendMsg = async (xmlJson)=>{
     三、公众号实战开发课程资料：\n 
     链接: https://pan.baidu.com/s/1CkB7DjPxvpDwVAyvABBshw?pwd=tpp3 提取码: tpp3 
     `
+  }else if(isPDDlind){
+    let pddRes = await getPDDgoodsDetail(xmlJson.Content, xmlJson.FromUserName, xmlJson.ToUserName)
+    console.log('pddRes===>', pddRes)
+    let PddProInfo = ''
+    if(pddRes && pddRes.promotion_rate > 0){
+      let tempName = pddRes.goods_name.slice(0, 10) + '...'
+      amount = pddRes.has_coupon?`优惠券: ${pddRes.coupon_discount.toFixed(2)}\n`:''
+      returnMoney = ((pddRes.min_normal_price - pddRes.coupon_discount)*(pddRes.promotion_rate/100)).toFixed(2)
+      PddProInfo = `商品名称：${tempName}\n优惠券：${pddRes.coupon_discount.toFixed(2)}\n券后价格：${(pddRes.min_normal_price - pddRes.coupon_discount).toFixed(2)}\n额外返现：${returnMoney}\n----------------\n<a href="${pddRes.urlWithGoodSign}">点击领券下单</a>\n**********************\n<a href="${commconfig.PDDListUrl+'?weui='+xmlJson.FromUserName}">点击查看我的订单</a>`
+    }else{
+      PddProInfo = '亲，该商家无活动哦！'
+    }
+    xmlJson.type = 'text'
+    xmlJson.content = PddProInfo
   }else if(isJDtest){
     // 提取字符串中的网址
     const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
@@ -34,7 +54,7 @@ const sendMsg = async (xmlJson)=>{
     let JdRes = await getGoodsInforandUrl(strValue, xmlJson.FromUserName, xmlJson.ToUserName)
     let JdformateProductInfo = ''
     if(JdRes.returnMoney !== 0 && JdRes.goodUrl){
-      let tempName = JdRes.goodName.slice(0, 11) + '...'
+      let tempName = JdRes.goodName.slice(0, 10) + '...'
       JdformateProductInfo = `商品名称：${tempName}\n优惠券：${JdRes.coupon}\n券后价格：${JdRes.afterPrice}\n额外返现：${JdRes.returnMoney}\n----------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>\n**********************\n<a href="${commconfig.JDListUrl+'?weui='+xmlJson.FromUserName}">点击查看我的订单</a>`
     }else{
       JdformateProductInfo = '亲，该商家无活动哦！'
@@ -42,7 +62,6 @@ const sendMsg = async (xmlJson)=>{
     xmlJson.type = 'text'
     xmlJson.content = JdformateProductInfo
   }else if(isSetMutip){ // 多租户设置
-    console.log('isSetMutip===>', isSetMutip)
     let sedMsg = await setMutiplePart(xmlJson)
     xmlJson.type = 'text'
     xmlJson.content = sedMsg
