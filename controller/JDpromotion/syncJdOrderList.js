@@ -9,13 +9,7 @@ const { getRedisValue, setRedisValue } = require("../../dataBase/redis")
 // 获取京东订单数据
 const getJdOrderList = async(startTime, endTime) => {
   let orderlistUrl = 'https://openapi.dataoke.com/api/dels/jd/order/get-official-order-list'
-  let params = {
-    type: 3, // 订单时间查询类型 1：下单时间，2：完成时间（购买用户确认收货时间），3：更新时间
-    key: commconfig.JDKEY, // 京东联盟授权key
-    startTime: startTime, // 开始时间 格式yyyy-MM-dd HH:mm:ss，与endTime间隔不超过1小时
-    endTime: endTime // 结束时间 格式yyyy-MM-dd HH:mm:ss，与startTime间隔不超过1小时
-  }
-  let goodListRes = await Promise.all(mutiApiReq(orderlistUrl, params))
+  let goodListRes = await Promise.all(mutiApiReq(orderlistUrl, startTime, endTime))
   let jdGoodList = []
   let orderIds = []
   let orderIdMap = {}

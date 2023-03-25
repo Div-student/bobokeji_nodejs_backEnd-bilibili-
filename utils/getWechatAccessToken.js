@@ -5,12 +5,12 @@ const { getRedisMap, setRedisMap } = require('../dataBase/redis')
 const file_path = __dirname + '/token_file/accessToken.json'
 
 // 测试号的 APPID && APPSECRET
-const APPID = 'wxea*****9b8'
-const APPSECRET = '638******d06'
+const APPID = 'wxe********b8'
+const APPSECRET = '6386********06'
 
 // 生产环境的 APPID && APPSECRET
-// const APPID = 'wxea*****147c'
-// const APPSECRET = '075a****a28'
+// const APPID = 'wxea********7c'
+// const APPSECRET = '075a********a28'
 
 let uri = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APPID}&secret=${APPSECRET}`
 
