@@ -19,7 +19,7 @@ const sendMsg = async (xmlJson)=>{
   // 判断是否是获取课程资料
   let autoJsLearn = /^(学习|资料)+[0-9]*$/
   let autoMatch = xmlJson.Content.match(autoJsLearn)
-  if(autoMatch !== null){
+  if(autoMatch !== null && xmlJson.ToUserName == "gh_16c32413485a"){
     xmlJson.type = 'text'
     xmlJson.content = `
     一、舔狗神器的资料和源码：\n
@@ -40,8 +40,8 @@ const sendMsg = async (xmlJson)=>{
     if(pddRes && pddRes.promotion_rate > 0){
       let tempName = pddRes.goods_name.slice(0, 10) + '...'
       amount = pddRes.has_coupon?`优惠券: ${pddRes.coupon_discount.toFixed(2)}\n`:''
-      returnMoney = ((pddRes.min_normal_price - pddRes.coupon_discount)*(pddRes.promotion_rate/100)).toFixed(2)
-      PddProInfo = `商品名称：${tempName}\n优惠券：${pddRes.coupon_discount.toFixed(2)}\n券后价格：${(pddRes.min_normal_price - pddRes.coupon_discount).toFixed(2)}\n额外返现：${returnMoney}\n----------------\n<a href="${pddRes.urlWithGoodSign}">点击领券下单</a>\n**********************\n<a href="${commconfig.PDDListUrl+'?weui='+xmlJson.FromUserName}">点击查看我的订单</a>`
+      returnMoney = ((pddRes.min_group_price - pddRes.coupon_discount)*(pddRes.promotion_rate/100)).toFixed(2)
+      PddProInfo = `商品名称：${tempName}\n优惠券：${pddRes.coupon_discount.toFixed(2)}\n券后价格：${(pddRes.min_group_price - pddRes.coupon_discount).toFixed(2)}\n额外返现：${returnMoney}\n----------------\n<a href="${pddRes.urlWithGoodSign}">点击领券下单</a>\n**********************\n<a href="${commconfig.JDListUrl+'?weui='+xmlJson.FromUserName+'&pageType=PDD'}">点击查看我的订单</a>`
     }else{
       PddProInfo = '亲，该商家无活动哦！'
     }
@@ -55,7 +55,7 @@ const sendMsg = async (xmlJson)=>{
     let JdformateProductInfo = ''
     if(JdRes.returnMoney !== 0 && JdRes.goodUrl){
       let tempName = JdRes.goodName.slice(0, 10) + '...'
-      JdformateProductInfo = `商品名称：${tempName}\n优惠券：${JdRes.coupon}\n券后价格：${JdRes.afterPrice}\n额外返现：${JdRes.returnMoney}\n----------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>\n**********************\n<a href="${commconfig.JDListUrl+'?weui='+xmlJson.FromUserName}">点击查看我的订单</a>`
+      JdformateProductInfo = `商品名称：${tempName}\n优惠券：${JdRes.coupon}\n券后价格：${JdRes.afterPrice}\n额外返现：${JdRes.returnMoney}\n----------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>\n**********************\n<a href="${commconfig.JDListUrl+'?weui='+xmlJson.FromUserName+'&pageType=JD'}">点击查看我的订单</a>`
     }else{
       JdformateProductInfo = '亲，该商家无活动哦！'
     }

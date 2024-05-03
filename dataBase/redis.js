@@ -4,7 +4,6 @@ const client = createClient();
 client.on('error', err => console.log('Redis Client Error', err));
 
 const getRedisValue = async (key)=>{
-  console.log("isOpen===>",client.isOpen)
   if(!client.isOpen){
     await client.connect();
   }
@@ -13,7 +12,7 @@ const getRedisValue = async (key)=>{
 }
 exports.getRedisValue = getRedisValue
 
-const setRedisMap = async (key,field, value) => {
+const setRedisMap = async (key, field, value) => {
   if(!client.isOpen){
     await client.connect();
   }
@@ -37,4 +36,10 @@ const setRedisValue = async (key, value) => {
   await client.set(key, value);
 }
 exports.setRedisValue = setRedisValue
+
+// setRedisMap("bobo11","bobo11","123")
+
+// getRedisValue("bobo")
+
+getRedisMap("bobo11", "bobo11")
 

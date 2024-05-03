@@ -18,7 +18,7 @@ const creatMenue = async () => {
         "name":"小程序",
         "url":"http://mp.weixin.qq.com",
         "appid":"wx5740cfc1ee869efc",
-        "pagepath":"pages/fistPage/fistPage"
+        "pagepath":"pages/index/index"
       }
     ]
   }

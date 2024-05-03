@@ -51,6 +51,10 @@ router.get('/home', async (ctx) =>{
   await ctx.render('home', {name:'波波科技网络工作室001'})
 })
 router.get('/bobokejiDoc', async (ctx) =>{
+  await ctx.render('bobokejiDoc', {})
+})
+// 申婷婷的页面
+router.get('/index', async (ctx) =>{
   await ctx.render('index', {})
 })
 // 京东订单列表页面
@@ -69,7 +73,7 @@ router.get('/', async (ctx, next) =>{
     ctx.body = validateRes.echostr
     next()
   }else{
-    await ctx.render('index', {})
+    await ctx.render('bobokejiDoc', {})
   }
 })
 
@@ -80,6 +84,9 @@ router.get('/', async (ctx, next) =>{
 const getJdOrderList = require('./controller/JDpromotion/getJdOrderList')
 router.use('/jdOrderList', getJdOrderList.routes())
 
+// 根据用户的wechat_uid获取PDD订单列表 api: /pddOrderList/get
+const getPddOrderList = require('./controller/PDDpromotion/getPddOrderList')
+router.use('/pddOrderList', getPddOrderList.routes())
 
 
 app.listen('8080')

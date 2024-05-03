@@ -11,7 +11,8 @@ const apiRequest = async (url, parms) => {
 }
 exports.apiRequest = apiRequest
 
-const mutiApiReq = (url, startTime, endTime)=>{ // 返回多个公众号请求的promise
+// 返回多个租户的大淘客JD订单请求的promise
+const mutiApiReq = (url, startTime, endTime)=>{ 
   let promiseList = []
   let accounts = commconfig.mutiaccounts
   promiseList = accounts.map(async items => {
@@ -33,3 +34,29 @@ const mutiApiReq = (url, startTime, endTime)=>{ // 返回多个公众号请求�
 }
 exports.mutiApiReq = mutiApiReq
 
+
+// 返回多个租户的PDD订单请求的promise
+const mutiApiReqPDD = (url, startTime, endTime)=>{ 
+  let promiseList = []
+  let accounts = commconfig.mutiaccounts
+  promiseList = accounts.map(async items => {
+    let params = {
+      queryOrderType: 1, // 订单类型：1-推广订单；2-直播间订单
+      startUpdateTime: startTime, // 查询开始时间，和结束时间相差不能超过24小时。
+      endUpdateTime: endTime, // 查询结束时间，和开始时间相差不能超过24小时。
+      version: 'v1.0.0'
+    }
+    let sdkReq = new dtkSdk({appKey:items.appKey, appSecret:items.appSecret, checkSign:2});
+    try{
+      let selUrlDetail = await sdkReq.request(url,{
+        method: "GET",
+        form: params
+      })
+      return selUrlDetail
+    }catch(err){
+      console.log('err===>', err)
+    }
+  })
+  return promiseList
+}
+exports.mutiApiReqPDD = mutiApiReqPDD
