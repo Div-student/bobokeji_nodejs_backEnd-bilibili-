@@ -17,24 +17,15 @@ let taobaoProInfor = {
 const getTaoBaoPro = async (content, accountName) => {
   console.log('content==>',content)
   // 根据不通的公众号初始化不同账号请求信息
-  // let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
-  // let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
-  // let ddxApiKey = await getMutiplePartAccount(accountName, "DdxapiKey")
-
-  let daTaoKeAppKey = "660e7ac257bd9"
-  let daTaoKeAppSecret = "bf439d809f1d9a08fe8bf9df4f6a5956"
-  let ddxApiKey = "ahXjQZy4GqF12zPrynL7cWkqZnflYwrB"
-
-  // let daTaoKeAppKey = "5ee62b32658a6"
-  // let daTaoKeAppSecret = "f1506316f0e0358b941c3606423db75f"
-  // let ddxApiKey = "rcMusPwsUKbYsHqptjuuaT8OiqWbYMfi"
+  let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
+  let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
+  let ddxApiKey = await getMutiplePartAccount(accountName, "DdxapiKey")
   
-
   console.log("daTaoKeAppSecret", daTaoKeAppKey, daTaoKeAppSecret)
   const sdkReq = new dtkSdk({appKey:daTaoKeAppKey, appSecret:daTaoKeAppSecret, checkSign:1});
   console.log("sdkReq===>", sdkReq)
   let productInfo = await sdkReq.request(URL,{method:"GET",form:{version:"v1.0.0", content }})
-  console.log("productInfo===>", productInfo)
+  console.log("万能解析接口===>", productInfo)
   let productData = productInfo.data
   
   if(productData){
@@ -46,16 +37,18 @@ const getTaoBaoPro = async (content, accountName) => {
     let productPri = await sdkReq.request(URLPri,{method:"GET",form:{version:"v1.3.1", goodsId:stringID}})
     let tempProductInfo = productPri.data
     console.log("tempProductInfo===>", tempProductInfo)
+    let realPrice = productData.realPostFee || tempProductInfo.actualPrice
+    console.log("realPrice===>", realPrice)
 
-    taobaoProInfor.couponInfo = tempProductInfo.originalPrice - productData.realPostFee
+    taobaoProInfor.couponInfo = tempProductInfo.originalPrice - realPrice
     taobaoProInfor.longTpwd = tempProductInfo.longTpwd + "https:/"
-    taobaoProInfor.price = productData.realPostFee
-    taobaoProInfor.returnMoney = ((productData.realPostFee * (tempProductInfo.maxCommissionRate/100)) * 0.9).toFixed(2)
+    taobaoProInfor.price = realPrice
+    taobaoProInfor.returnMoney = ((realPrice * (tempProductInfo.maxCommissionRate/100)) * 0.9).toFixed(2)
   }else if(productInfo.code == 400){ // 淘口令转淘口令接口
     let productInfo = await sdkReq.request(URLTWD,{method:"GET",form:{version:"v1.0.0", content }})
     let tempproductInfo = productInfo.data
     
-    console.log("productInfo===>", productInfo)
+    console.log("淘口令转淘口令===>", productInfo)
     if(tempproductInfo){
       taobaoProInfor.couponInfo = tempproductInfo.originalPrice - tempproductInfo.actualPrice
       taobaoProInfor.longTpwd = tempproductInfo.longTpwd + "https:/"
@@ -77,6 +70,7 @@ const getTaoBaoPro = async (content, accountName) => {
       longTpwd: '' // 淘口令
     }
   }
+  console.log('taobaoProInfor==>', taobaoProInfor)
   return taobaoProInfor
 }
 
@@ -101,7 +95,6 @@ const getProFormDDX = async(contentMsg, apikey) => {
     method: "POST",
     uri: URL,
     body: {
-      // apikey: "rcMusPwsUKbYsHqptjuuaT8OiqWbYMfi",
       apikey: apikey,
       content: contentMsg
     },
@@ -115,10 +108,10 @@ const getProFormDDX = async(contentMsg, apikey) => {
   return stringID
 }
 
-let contents = `【淘宝】https://m.tb.cn/h.gbE9y4m0IxxNrf1?tk=sKCaWHjVLaM ZH4920 「母亲节礼物实用保罗女包送妈妈包包女2024新款女士包包真皮手提包」
-点击链接直接打开 或者 淘宝搜索直接打开`
+// let contents = `【淘宝】https://m.tb.cn/h.g137XXv6qDDL6s6?tk=ulYLWHEkRuq HU0854 「植物医生官方正品山茶花补水护肤水乳套装平价化妆品春季干皮T1」
+// 点击链接直接打开 或者 淘宝搜索直接打开`
 
-getTaoBaoPro(contents)
+// getTaoBaoPro(contents)
 
 
-// exports.getTaoBaoPro = getTaoBaoPro
+exports.getTaoBaoPro = getTaoBaoPro
