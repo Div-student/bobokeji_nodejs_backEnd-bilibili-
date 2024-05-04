@@ -25,8 +25,9 @@ const getGoodID = async(url, sdkReq)=>{
   })
   if(res.code === 0 && res.data){
     goodID = res.data.skuId
+    itemUrl = res.data.itemUrl
   }
-  return goodID
+  return {goodID, itemUrl}
 }
 
 // 2、调用`京东联盟搜索`接口获取商品详细信息
@@ -34,7 +35,7 @@ const getGoodInfor = async(url, sdkReq) => {
   let skuIds = await getGoodID(url, sdkReq)
   let res = await sdkReq.request('https://openapi.dataoke.com/api/dels/jd/goods/search',{
     method:"GET",
-    form:{skuIds, version:"v1.0.0"}
+    form:{skuIds:skuIds.goodID, version:"v1.0.0"}
   })
   if(res.code === 0 && res.data){
     const temp = res.data.list[0]
@@ -47,6 +48,9 @@ const getGoodInfor = async(url, sdkReq) => {
 
 // 3、调用`京东商品转链`接口将商品转换成自己的推广链接
 const getSelfUrl = async (materialId, wechatId, accountName, sdkReq)=>{
+  // 修复大淘客‘京东商品转链’接口的bug,需要先调‘京东链接解析’接口转换京东链接
+  let itemUrl = await getGoodID(materialId, sdkReq)
+
   let sql = `select * from user where wechat_uid='${wechatId}' and account_name='${accountName}'`
   let sqlres = await queryData(sql)
   let user_id = 0
@@ -56,7 +60,7 @@ const getSelfUrl = async (materialId, wechatId, accountName, sdkReq)=>{
   let JDunionId = await getMutiplePartAccount(accountName, "JDunionId")
   let res = await sdkReq.request('https://openapi.dataoke.com/api/dels/jd/kit/promotion-union-convert',{
     method:"GET",
-    form:{ unionId:JDunionId, materialId, positionId:user_id, version:"v1.0.0"}
+    form:{ unionId:JDunionId, materialId:itemUrl.itemUrl, positionId:user_id, version:"v1.0.0"}
   })
   if(res.code === 0 && res.data){
     goodInformation.goodUrl = res.data.shortUrl
