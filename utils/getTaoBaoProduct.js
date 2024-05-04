@@ -20,6 +20,8 @@ const getTaoBaoPro = async (content, accountName) => {
   let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
   let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
   let ddxApiKey = await getMutiplePartAccount(accountName, "DdxapiKey")
+  let returnRate = await getMutiplePartAccount(accountName, "returnRate")
+  let returnRateNum = Number(returnRate)/100
   
   console.log("daTaoKeAppSecret", daTaoKeAppKey, daTaoKeAppSecret)
   const sdkReq = new dtkSdk({appKey:daTaoKeAppKey, appSecret:daTaoKeAppSecret, checkSign:1});
@@ -43,7 +45,7 @@ const getTaoBaoPro = async (content, accountName) => {
     taobaoProInfor.couponInfo = tempProductInfo.originalPrice - realPrice
     taobaoProInfor.longTpwd = tempProductInfo.longTpwd + "https:/"
     taobaoProInfor.price = realPrice
-    taobaoProInfor.returnMoney = ((realPrice * (tempProductInfo.maxCommissionRate/100)) * 0.9).toFixed(2)
+    taobaoProInfor.returnMoney = ((realPrice * (tempProductInfo.maxCommissionRate/100)) * returnRateNum).toFixed(2)
   }else if(productInfo.code == 400){ // 淘口令转淘口令接口
     let productInfo = await sdkReq.request(URLTWD,{method:"GET",form:{version:"v1.0.0", content }})
     let tempproductInfo = productInfo.data
@@ -53,7 +55,7 @@ const getTaoBaoPro = async (content, accountName) => {
       taobaoProInfor.couponInfo = tempproductInfo.originalPrice - tempproductInfo.actualPrice
       taobaoProInfor.longTpwd = tempproductInfo.longTpwd + "https:/"
       taobaoProInfor.price = tempproductInfo.actualPrice
-      taobaoProInfor.returnMoney = ((tempproductInfo.actualPrice * (tempproductInfo.maxCommissionRate/100)) * 0.9).toFixed(2)
+      taobaoProInfor.returnMoney = ((tempproductInfo.actualPrice * (tempproductInfo.maxCommissionRate/100)) * returnRateNum).toFixed(2)
     }else{
       taobaoProInfor = {
         couponInfo: 0, // 优惠券

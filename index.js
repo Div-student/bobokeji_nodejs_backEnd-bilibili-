@@ -34,7 +34,14 @@ app.use(async ctx => {
     let xmlMsg = ''
     if(xmlJson.MsgType==='event' && xmlJson.EventKey === 'chifanpiao'){
       xmlMsg = await sendNewsMsg(xmlJson)
-    } else if(xmlJson.MsgType==='text'){
+    }else if(xmlJson.MsgType==='event' && xmlJson.Event==="subscribe"){
+      xmlJson.type = 'text'
+      xmlJson.content = `
+      点击下方目录获取优惠🧧\n
+      <a href="weixin://bizmsgmenu?msgmenucontent=外卖优惠&msgmenuid=1">每日外卖优惠</a>
+      `
+      xmlMsg = xmlJson
+    }else if(xmlJson.MsgType==='text'){
       // 新增用户绑定openId
       await createUser(xmlJson.FromUserName, xmlJson.ToUserName)
       xmlMsg = await sendMsg(xmlJson)

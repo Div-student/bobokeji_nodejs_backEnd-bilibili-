@@ -30,7 +30,7 @@ const setMutiplePart = async(xmlJson) => {
   let acountKey = xmlJson.Content.split(' ')[1]
   let acountValue = xmlJson.Content.split(' ')[2]
   let desc = xmlJson.Content.split(' ')[3]
-  let accountTypes = ["daTaoKeAppKey", "daTaoKeAppSecret", "JDunionId", "PDDpid", "DdxapiKey"]
+  let accountTypes = ["daTaoKeAppKey", "daTaoKeAppSecret", "JDunionId", "PDDpid", "DdxapiKey", "returnRate", "waimaiUrl"]
   if(!accountTypes.includes(acountKey)){
     sendMsg = '您设置的账号类型不对'
     return sendMsg

@@ -19,6 +19,7 @@ let goodInformation = {
 // 1、调用`京东链接解析`接口获取商品的ID
 const getGoodID = async(url, sdkReq)=>{
   let goodID = ''
+  let itemUrl = ''
   let res = await sdkReq.request('https://openapi.dataoke.com/api/dels/jd/kit/parseUrl',{
     method:"GET",
     form:{url, version:"v1.0.0"}
@@ -31,17 +32,20 @@ const getGoodID = async(url, sdkReq)=>{
 }
 
 // 2、调用`京东联盟搜索`接口获取商品详细信息
-const getGoodInfor = async(url, sdkReq) => {
+const getGoodInfor = async(url, sdkReq, accountName) => {
   let skuIds = await getGoodID(url, sdkReq)
   let res = await sdkReq.request('https://openapi.dataoke.com/api/dels/jd/goods/search',{
     method:"GET",
     form:{skuIds:skuIds.goodID, version:"v1.0.0"}
   })
+  let returnRate = await getMutiplePartAccount(accountName, "returnRate")
+  let returnRateNum = Number(returnRate)/100
+
   if(res.code === 0 && res.data){
     const temp = res.data.list[0]
     goodInformation.goodName = temp.skuName;
     goodInformation.afterPrice = temp.lowestCouponPrice;
-    goodInformation.returnMoney = temp.couponCommission;
+    goodInformation.returnMoney = (temp.couponCommission * returnRateNum).toFixed(2);
     goodInformation.coupon = Math.ceil(temp.lowestPrice - temp.lowestCouponPrice)
   }
 }
@@ -50,7 +54,7 @@ const getGoodInfor = async(url, sdkReq) => {
 const getSelfUrl = async (materialId, wechatId, accountName, sdkReq)=>{
   // 修复大淘客‘京东商品转链’接口的bug,需要先调‘京东链接解析’接口转换京东链接
   let itemUrl = await getGoodID(materialId, sdkReq)
-
+  console.log('itemUrl===>', itemUrl)
   let sql = `select * from user where wechat_uid='${wechatId}' and account_name='${accountName}'`
   let sqlres = await queryData(sql)
   let user_id = 0
@@ -62,6 +66,7 @@ const getSelfUrl = async (materialId, wechatId, accountName, sdkReq)=>{
     method:"GET",
     form:{ unionId:JDunionId, materialId:itemUrl.itemUrl, positionId:user_id, version:"v1.0.0"}
   })
+  console.log('自己的推广链接===>', res)
   if(res.code === 0 && res.data){
     goodInformation.goodUrl = res.data.shortUrl
   }
@@ -74,8 +79,7 @@ const getGoodsInforandUrl = async(url, wechatId, accountName) => {
   let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
   let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
   const sdkReq = new dtkSdk({appKey:daTaoKeAppKey, appSecret:daTaoKeAppSecret, checkSign:2});
-
-  await Promise.all([getGoodInfor(url, sdkReq), getSelfUrl(url, wechatId, accountName, sdkReq)])
+  await Promise.all([getGoodInfor(url, sdkReq, accountName), getSelfUrl(url, wechatId, accountName, sdkReq)])
   return goodInformation
 }
 
