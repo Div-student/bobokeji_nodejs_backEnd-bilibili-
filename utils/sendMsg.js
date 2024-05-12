@@ -22,7 +22,7 @@ const sendMsg = async (xmlJson)=>{
   // 判断是否是获取课程资料
   let autoJsLearn = /^(学习|资料)+[0-9]*$/
   let autoMatch = xmlJson.Content.match(autoJsLearn)
-  if(autoMatch !== null && xmlJson.ToUserName == "gh_646ed578bcef"){
+  if(autoMatch !== null && xmlJson.ToUserName == "gh_16c32413485a"){
     xmlJson.type = 'text'
     xmlJson.content = `
     一、舔狗神器的资料和源码：\n
@@ -68,13 +68,13 @@ const sendMsg = async (xmlJson)=>{
 
   }else if(isJDtest){
     // 提取字符串中的网址
-    const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
-    const strValue = xmlJson.Content.match(reg)[0];
-    let JdRes = await getGoodsInforandUrl(strValue, xmlJson.FromUserName, xmlJson.ToUserName)
+    // const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
+    // const strValue = xmlJson.Content.match(reg)[0];
+    let JdRes = await getGoodsInforandUrl(xmlJson.Content, xmlJson.FromUserName, xmlJson.ToUserName)
     let JdformateProductInfo = ''
     if(JdRes.returnMoney !== 0 && JdRes.goodUrl){
-      let tempName = JdRes.goodName.slice(0, 10) + '...'
-      JdformateProductInfo = `商品名称：${tempName}\n优惠券：${JdRes.coupon}\n券后价格：${JdRes.afterPrice}\n额外返现：${JdRes.returnMoney}\n----------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>`
+      let tempName = JdRes.goodName.slice(0, 12) + '...'
+      JdformateProductInfo = `已为您找到推荐商品:\n--------------------------\n店铺：${JdRes.shopName}\n商品：${tempName}\n优惠券：${JdRes.coupon}\n券后价：${JdRes.afterPrice}\n额外返：${JdRes.returnMoney}\n--------------------------\n<a href="${JdRes.goodUrl}">点击领券下单</a>`
     }else{
       JdformateProductInfo = '亲，该商家无活动哦！'
     }

@@ -9,6 +9,7 @@ const { getMutiplePartAccount } = require('../../utils/setMutiplePart')
  */ 
 
 let goodInformation = {
+  shopName: "",
   goodName: '',
   coupon: '',
   afterPrice: 0,
@@ -72,14 +73,59 @@ const getSelfUrl = async (materialId, wechatId, accountName, sdkReq)=>{
   }
 }
 
+// 由于京东联盟对比价订单限制，转链接接口不支持数字id，获取优惠券直接改成京东联盟搜索接口
+const getJDgoodsInoforAll = async(sdkReq, keyword, accountName) => {
+  let res = await sdkReq.request('https://openapi.dataoke.com/api/dels/jd/goods/search',{
+    method:"GET",
+    form:{version:"v1.0.0", keyword, sortName:"price", sort:"aesc"}
+  })
+  if(res.code == 0 && res.data.list.length > 0){
+    let goodRes = res.data.list[0]
+
+    let returnRate = await getMutiplePartAccount(accountName, "returnRate")
+    let returnRateNum = Number(returnRate)/100
+
+
+    let goodUrl = ''
+    if(goodRes.couponList.length > 0){
+      goodUrl = goodRes.couponList[0].link
+    }else{
+      goodUrl = goodRes.materialUrl
+    }
+
+    goodInformation = {
+      shopName: goodRes.shopName,
+      goodName: goodRes.skuName,
+      coupon: goodRes.lowestPrice - goodRes.lowestCouponPrice,
+      afterPrice: goodRes.lowestCouponPrice,
+      returnMoney: (goodRes.couponCommission * returnRateNum).toFixed(2),
+      goodUrl: goodUrl
+    }
+  }
+}
+
+// 从京东链接中获取搜索关键字
+const getJDKeyWord = (url) => {
+  console.log("JD keyWord ==>url", url)
+  let match = url.match(/「(.*?)」/);
+  let keyWord = ""
+  if (match) {
+    keyWord = match[1].replace(/【[^】]*】/, '')
+  }
+  console.log("JD keyWord ==>", keyWord)
+  return keyWord
+}
+
 const getGoodsInforandUrl = async(url, wechatId, accountName) => {
   // 清空上次的缓存数据，防止JD查询无商品返现时返回了推荐的商品
-  goodInformation = { goodName: '', coupon: '', afterPrice: 0, returnMoney: 0, goodUrl: '' }
+  goodInformation = { shopName: "", goodName: '', coupon: '', afterPrice: 0, returnMoney: 0, goodUrl: '' }
   // 根据不通的公众号初始化不同账号请求信息
   let daTaoKeAppKey = await getMutiplePartAccount(accountName, "daTaoKeAppKey")
   let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
   const sdkReq = new dtkSdk({appKey:daTaoKeAppKey, appSecret:daTaoKeAppSecret, checkSign:2});
-  await Promise.all([getGoodInfor(url, sdkReq, accountName), getSelfUrl(url, wechatId, accountName, sdkReq)])
+  // await Promise.all([getGoodInfor(url, sdkReq, accountName), getSelfUrl(url, wechatId, accountName, sdkReq)])
+  let keyWord = getJDKeyWord(url)
+  await getJDgoodsInoforAll(sdkReq, keyWord, accountName)
   return goodInformation
 }
 
