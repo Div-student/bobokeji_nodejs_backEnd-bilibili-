@@ -41,5 +41,5 @@ exports.setRedisValue = setRedisValue
 
 // getRedisValue("bobo")
 
-getRedisMap("bobo11", "bobo11")
+// getRedisMap("bobo11", "bobo11")
 
