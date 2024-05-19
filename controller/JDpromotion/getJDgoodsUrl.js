@@ -2,6 +2,7 @@ const dtkSdk = require('dtk-nodejs-api-sdk');
 const { commconfig } = require('../../utils/commconfig');
 const { queryData } = require('../../dataBase')
 const { getMutiplePartAccount } = require('../../utils/setMutiplePart')
+const rq = require('request-promise')
 /*
  *  @checkSign: 1 默认老版本验签  2 新版验签
  *  @appKey: 用户填写 appkey
@@ -114,6 +115,48 @@ const getJDKeyWord = (url) => {
   return keyWord
 }
 
+// 从消息中获取京东商品链接
+const extractUrl = (str) => {
+  const regex = /https?:\/\/\S+/;
+  const match = str.match(regex);
+  let temp = match[0].split("「")
+  return temp[0] ? temp[0] : null;
+}
+
+// 从订单客联盟获取京东转链接
+const getSelfUrlfromDDk = async(content, accountName) => {
+  let goods_link = extractUrl(content)
+  console.log('goods_link==>', goods_link)
+  let apikey = await getMutiplePartAccount(accountName, "JTKapikey")
+  let sid = await getMutiplePartAccount(accountName, "JTKsid")
+  let rqParam = { apikey, goods_link, sid }
+  let param = {
+    method: "POST",
+    uri: `http://api.jutuike.com/jd/get_goods_link`,
+    body: rqParam,
+    json: true
+  }
+  let res = await rq.post(param)
+
+  if(res.code == 1 && res.data){
+    let goodRes = res.data
+    let returnRate = await getMutiplePartAccount(accountName, "returnRate")
+    let returnRateNum = Number(returnRate)/100
+
+    goodInformation = {
+      shopName: goodRes.shopInfo.shopName,
+      goodName: goodRes.skuName,
+      coupon: (goodRes.priceInfo.lowestPrice - goodRes.priceInfo.lowestCouponPrice).toFixed(2),
+      afterPrice: goodRes.priceInfo.lowestCouponPrice,
+      returnMoney: (goodRes.commissionInfo.couponCommission * returnRateNum).toFixed(2),
+      goodUrl: goodRes.link
+    }
+  }
+
+  console.log('goodInformation==>', goodInformation)
+
+}
+
 const getGoodsInforandUrl = async(url, wechatId, accountName) => {
   // 清空上次的缓存数据，防止JD查询无商品返现时返回了推荐的商品
   goodInformation = { shopName: "", goodName: '', coupon: '', afterPrice: 0, returnMoney: 0, goodUrl: '' }
@@ -123,9 +166,14 @@ const getGoodsInforandUrl = async(url, wechatId, accountName) => {
   let daTaoKeAppSecret = await getMutiplePartAccount(accountName, "daTaoKeAppSecret")
   const sdkReq = new dtkSdk({appKey:daTaoKeAppKey, appSecret:daTaoKeAppSecret, checkSign:2});
   // await Promise.all([getGoodInfor(url, sdkReq, accountName), getSelfUrl(url, wechatId, accountName, sdkReq)])
-  let keyWord = getJDKeyWord(url)
-  await getJDgoodsInoforAll(sdkReq, keyWord, accountName, wechatId)
+  // let keyWord = getJDKeyWord(url)
+  // await getJDgoodsInoforAll(sdkReq, keyWord, accountName, wechatId)
+  await getSelfUrlfromDDk(url, accountName)
   return goodInformation
 }
+
+// let url = `【京东】https://3.cn/1ZbF2-H1「垃圾袋家用厨房酒店学校办公手提黑色加厚塑料袋大号一次性 200只装」
+// 点击链接直接打开`
+// getSelfUrlfromDDk(url)
 
 exports.getGoodsInforandUrl = getGoodsInforandUrl
