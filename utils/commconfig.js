@@ -5,7 +5,7 @@ exports.commconfig = {
   JDListUrl: "http://sq3bxt.natappfree.cc/jdlist", // 京东订单列表页面url
   PDDListUrl: "http://sq3bxt.natappfree.cc/pddlist", // PDD订单列表页面url
   superManagerIds: ["oF-RA6fbdaY0mXnMW5lzgWVlpOXM"], // 超级管理可以查看自己公众号的所有订单
-  systemManager: ["oF-RA6fbdaY0mXnMW5lzgWVlpOXM","oLx4r6txZ5_HIsL5qVcNzTb5np44"], // 系统管理员用来设置其他租户的账号对接信息
+  systemManager: ["oF-RA6fbdaY0mXnMW5lzgWVlpOXM","oLx4r6txZ5_HIsL5qVcNzTb5np44","oLx4r6rNaUe5oRipYP6_ImloLaWo"], // 系统管理员用来设置其他租户的账号对接信息
   mutiaccounts:[{
     appKey:'5ee62b32658a6', // 大淘客Appkey
     appSecret:'f1506316f0e0358b941c3606423db75f', // 大淘客app密钥
