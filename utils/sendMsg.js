@@ -2,17 +2,22 @@
 const { getGoodsInforandUrl } = require('../controller/JDpromotion/getJDgoodsUrl')
 const { getPDDgoodsDetail } = require('../controller/PDDpromotion/getPDDgoodsInfor')
 const { getTaoBaoPro } = require('../utils/getTaoBaoProduct')
+const { searchProApi } = require('../controller/DYpromotion/getDyproductInfo')
 const { commconfig } = require('./commconfig')
 const { setRedisMap } = require('../dataBase/redis')
 const { setMutiplePart, getMutiplePartAccount } = require('./setMutiplePart')
 
 const sendMsg = async (xmlJson)=>{
   // 外卖优惠
-  let buycoupon =  /^(外卖优惠|美团)$/
+  let buycoupon =  /^(外卖优惠|美团|饿了么|电影)$/
   let isBuycoupon = buycoupon.test(xmlJson.Content)
   // 调用京东接口查询返现
   let JDrepx = /【京东】/
   let isJDtest = JDrepx.test(xmlJson.Content)
+  // 调用京东接口查询返现
+  let DYrepx = /【抖音商城】/
+  let isDYtest = DYrepx.test(xmlJson.Content)
+  console.log("isDYtest==>", isDYtest)
   // 判断是否为拼多多链接
   let pddEXP = /(\bgoodsid\b|\bpxq_secret_key\b)/
   let isPDDlind = pddEXP.test(xmlJson.Content)
@@ -22,7 +27,7 @@ const sendMsg = async (xmlJson)=>{
   // 判断是否是获取课程资料
   let autoJsLearn = /^(学习|资料)+[0-9]*$/
   let autoMatch = xmlJson.Content.match(autoJsLearn)
-  if(autoMatch !== null && xmlJson.ToUserName == "gh_16c32413485a"){
+  if(autoMatch !== null && xmlJson.ToUserName == "gh_646ed578bcef"){
     xmlJson.type = 'text'
     xmlJson.content = `
     一、舔狗神器的资料和源码：\n
@@ -55,9 +60,6 @@ const sendMsg = async (xmlJson)=>{
       xmlJson.count = 1
     }
   }else if(isJDtest){
-    // 提取字符串中的网址
-    // const reg = /(https?|http):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
-    // const strValue = xmlJson.Content.match(reg)[0];
     let JdRes = await getGoodsInforandUrl(xmlJson.Content, xmlJson.FromUserName, xmlJson.ToUserName)
     let JdformateProductInfo = ''
     if(JdRes.returnMoney !== 0 && JdRes.goodUrl){
@@ -76,6 +78,27 @@ const sendMsg = async (xmlJson)=>{
     let sedMsg = await setMutiplePart(xmlJson)
     xmlJson.type = 'text'
     xmlJson.content = sedMsg
+  }else if(isDYtest){
+    let hasMoulds = await getMutiplePartAccount(xmlJson.ToUserName, "hasMoulds")
+    if(hasMoulds.indexOf("DY")<0){
+      xmlJson.type = 'text'
+      xmlJson.content = `您可以发送TB/JD商品链，我可以帮您自动找券！！`
+    }else{
+      let DyRes = await searchProApi(xmlJson.Content, xmlJson.ToUserName)
+      let DyformateProductInfo = ''
+      if(DyRes.longTpwd){
+        let tempName = DyRes.goodName.slice(0, 12) + '...'
+        if(DyRes.returnMoney == "0.00"){
+          DyformateProductInfo = `已为您找到推荐商品:\n--------------------------\n店铺：${DyRes.shopName}\n商品：${tempName}\n券后价：${DyRes.price}\n--------------------------\n${DyRes.longTpwd}`
+        }else{
+          DyformateProductInfo = `已为您找到推荐商品:\n--------------------------\n店铺：${DyRes.shopName}\n商品：${tempName}\n券后价：${DyRes.price}\n额外返：${DyRes.returnMoney}\n--------------------------\n${DyRes.longTpwd}`
+        }
+      }else{
+        DyformateProductInfo = '亲，该商家无活动哦！'
+      }
+      xmlJson.type = 'text'
+      xmlJson.content = DyformateProductInfo
+    }
   }else{
     // 查询淘宝官方接口，返回商品返现和优惠券详情逻辑
     let taobaoPro = await getTaoBaoPro(xmlJson.Content, xmlJson.ToUserName)
