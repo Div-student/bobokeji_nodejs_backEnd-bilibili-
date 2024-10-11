@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>mofish激活码</title>
+  <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/2.0.1/weui.min.css"><link>
+  <link rel="stylesheet" href="/style/jdlist.css">
+  <style>
+    .itemWrap{
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .inputWrap{
+      display: flex;
+      justify-content: space-around;
+      margin: 10px 0;
+    }
+    .inputclass{
+      flex: 4;
+      margin-right: 5px;
+    }
+    #genBtn, #queryBtn{
+      width:50px;
+      margin-left: 10px;
+    }
+    #resCode{
+      width: 100%;
+      white-space: normal;
+      overflow-wrap: break-word;
+      
+    }
+    .page{
+      padding: 10px;
+    }
+    .page>div{
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="inputWrap">
+      <input type="text" id="machineInput" class="inputclass" placeholder="请输入机器ID"> <button id="queryBtn" onclick="queryHist()">查询</button >
+    </div>
+    <div class="inputWrap">
+      <input type="text"  id="dateInput" class="inputclass" placeholder="请输入到期时间"> <input type="text" id="priceInput" class="inputclass" placeholder="付费金额"> <button id='genBtn' onclick="genActiveCode()">生成</button>
+    </div>
+    <div>
+      <div id="codeHistory"></div>
+    </div>
+    <div>
+      <pre id="resCode"></pre>
+      <button id="copyBtn" onclick="copyActiveCode()">点击复制</button>
+    </div>
+  </div>
+  <script src="/javascript/axios.js"></script>
+  <script>
+    let codeHistoryDom = document.getElementById("codeHistory")
+    let machineInputDom = document.getElementById("machineInput")
+    let dateInputDom = document.getElementById("dateInput")
+    let priceInputDom = document.getElementById("priceInput")
+    let resCodeDom = document.getElementById("resCode")
+
+
+    let ACTIVE_CODE = ""
+
+    function queryHist(){
+      console.log("machineInputDom", machineInputDom.value) // 59695ba15d4bdcc6187994c2b242c231713da5b9ae9215d01fee1f817450c70d
+      axios.post("/getActiveHistory/get", {machId:machineInputDom.value}).then(res => {
+        console.log("res===>", res.data.result)
+        let result = res.data.result
+        let codeHistoryInnerDom = ""
+        result.forEach(element => {
+          codeHistoryInnerDom += `<div class="itemWrap">
+          <span>时间：${element.create_date}</span><span>付费：${element.price}元</span><span>到期：${element.effictive_date}</span>
+        </div>`
+        });
+        codeHistoryDom.innerHTML = codeHistoryInnerDom
+      })
+    }
+
+    function genActiveCode(){
+      let params = {
+        machId: machineInputDom.value,
+        price: priceInputDom.value,
+        expireDate: dateInputDom.value
+      }
+      let resultFlag = validateParam(params)
+      if(!resultFlag){
+        alert("入参不能为空")
+        return
+      }
+      axios.post("/getMofishActiveCode/get", params).then(res => {
+        console.log("res===>", res)
+        let result = res.data
+        resCodeDom.innerHTML = result.encryptedDataBase64
+        ACTIVE_CODE = result.encryptedDataBase64
+      })
+    }
+
+    function validateParam(params){
+      console.log("params===>", params)
+      let flag = true
+      if(!params.machId || !params.expireDate){ 
+        flag = false
+      }
+      return flag
+    }
+
+    function copyActiveCode() {
+      if(!ACTIVE_CODE){
+        alert("没有生成激活码？")
+        return
+      }
+      if(!navigator.clipboard){
+        copyTextToClipboard(ACTIVE_CODE)
+      }else{
+        navigator.clipboard.writeText(ACTIVE_CODE).then(() => {
+          alert("激活码复制成功")
+          console.log('文本已复制到剪贴板');
+        }).catch(err => {
+          console.error('复制失败:', err);
+        });
+      }
+      
+    }
+
+    // 非https环境中实现复制功能
+    function copyTextToClipboard(text) {
+      const input = document.createElement('input');
+      input.value = text;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      alert("激活码复制成功1")
+      console.log('Text copied to clipboard');
+    }
+  </script>
+</body>
+</html>

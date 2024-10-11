@@ -60,10 +60,6 @@ router.get('/home', async (ctx) =>{
 router.get('/bobokejiDoc', async (ctx) =>{
   await ctx.render('bobokejiDoc', {})
 })
-// 申婷婷的页面
-router.get('/index', async (ctx) =>{
-  await ctx.render('index', {})
-})
 // 京东订单列表页面
 router.get('/jdlist', async (ctx) =>{
   await ctx.render('jdList', {})
@@ -72,6 +68,11 @@ router.get('/jdlist', async (ctx) =>{
 // 拼多多订单列表页面
 router.get('/pddlist', async (ctx) =>{
   await ctx.render('pddList', {})
+})
+
+// 摸鱼神器订单列表页面
+router.get('/mofish', async (ctx) =>{
+  await ctx.render('mofish', {})
 })
 
 router.get('/', async (ctx, next) =>{
@@ -94,6 +95,14 @@ router.use('/jdOrderList', getJdOrderList.routes())
 // 根据用户的wechat_uid获取PDD订单列表 api: /pddOrderList/get
 const getPddOrderList = require('./controller/PDDpromotion/getPddOrderList')
 router.use('/pddOrderList', getPddOrderList.routes())
+
+// 生成摸鱼神器的激活码 api: /getMofishActiveCode/get
+const activeMofishCode = require('./controller/MofishApi/activeMofishCode')
+router.use('/getMofishActiveCode', activeMofishCode.routes())
+
+// 根据机器id获取激活历史数据 api: /getActiveHistory/get
+const getActiveHistory = require('./controller/MofishApi/getActiveHistory')
+router.use('/getActiveHistory', getActiveHistory.routes())
 
 
 app.listen('8080')

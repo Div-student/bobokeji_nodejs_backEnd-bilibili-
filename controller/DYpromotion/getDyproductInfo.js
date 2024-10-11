@@ -12,6 +12,15 @@ let douyingProInfor = {
 
 // 抖音精选联盟商品搜索API接口
 const searchProApi = async (title, accountName) => {
+  douyingProInfor = {
+    shopName: '',
+    goodName:'',
+    couponInfo: 0, // 优惠券
+    price: 0, // 券后价格
+    returnMoney: '', // 额外返现
+    longTpwd: '' // 淘口令
+  }
+
   let JTKpubId = await getMutiplePartAccount(accountName, "JTKpubId") 
   // let JTKpubId = 5570
   let rqParam = {
@@ -71,7 +80,7 @@ const getProApi = async (id, pub_id) => {
 
 exports.searchProApi = searchProApi
 
-let title = `9.28 reo:/ r@r.Rx 01/26 【抖音商城】https://v.douyin.com/i2wDMRRN/ 【卡宾熊】130g*10袋猫耳酥休闲零食童年回忆猫耳朵食品
-长按复制此条消息，打开抖音搜索，查看商品详情！`
+// let title = `9.28 reo:/ r@r.Rx 01/26 【抖音商城】https://v.douyin.com/i2wDMRRN/ 【卡宾熊】130g*10袋猫耳酥休闲零食童年回忆猫耳朵食品
+// 长按复制此条消息，打开抖音搜索，查看商品详情！`
 
 // searchProApi(title)
